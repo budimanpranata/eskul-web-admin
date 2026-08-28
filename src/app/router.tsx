@@ -1,0 +1,35 @@
+import { createBrowserRouter } from 'react-router-dom';
+
+import { AdminLayout } from '@/components/layout/AdminLayout';
+import { AnalyticsPage } from '@/features/analytics/AnalyticsPage';
+import { AuditLogsPage } from '@/features/audit-logs/AuditLogsPage';
+import { LoginPage } from '@/features/auth/LoginPage';
+import { CoachesPage } from '@/features/coaches/CoachesPage';
+import { DashboardPage } from '@/features/dashboard/DashboardPage';
+import { ExtracurricularsPage } from '@/features/extracurriculars/ExtracurricularsPage';
+import { ParentRelationsPage } from '@/features/parent-relations/ParentRelationsPage';
+import { ReportsPage } from '@/features/reports/ReportsPage';
+import { StudentsPage } from '@/features/students/StudentsPage';
+import { ProtectedRoute } from './ProtectedRoute';
+
+export const router = createBrowserRouter([
+  { path: '/login', element: <LoginPage /> },
+  {
+    path: '/',
+    element: (
+      <ProtectedRoute>
+        <AdminLayout />
+      </ProtectedRoute>
+    ),
+    children: [
+      { index: true, element: <DashboardPage /> },
+      { path: 'analytics', element: <AnalyticsPage /> },
+      { path: 'students', element: <StudentsPage /> },
+      { path: 'coaches', element: <CoachesPage /> },
+      { path: 'extracurriculars', element: <ExtracurricularsPage /> },
+      { path: 'parent-relations', element: <ParentRelationsPage /> },
+      { path: 'reports', element: <ReportsPage /> },
+      { path: 'audit-logs', element: <AuditLogsPage /> },
+    ],
+  },
+]);
