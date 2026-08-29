@@ -6,8 +6,8 @@ Stack: **React 19 · Vite 8 · TypeScript · React Router · Zustand · TanStack
 
 Referensi arsitektur: `../system-design-ekosistem-ekskul-sd.md` (bagian 5.3 — Alur Dashboard Admin).
 
-> **Status: Fase 1.2.** Login nyata + halaman CRUD Data Master (Siswa, Guru Pembina,
-> Ekskul + Jadwal + Anggota) sudah berfungsi terhadap backend. Halaman lain
+> **Status: Fase 1.2 + 2.2.** Login nyata + CRUD Data Master (Siswa/Pembina/Ekskul)
+> + **cetak kartu QR siswa & rotasi `qr_token`** (2.2). Halaman lain
 > (dashboard, analitik, relasi ortu, laporan, audit log) masih placeholder.
 
 ## Struktur folder
@@ -114,3 +114,10 @@ Alasan:
       (cari siswa, daftarkan/keluarkan, cek kapasitas dari backend)
 - [x] `tsc -b` + `vite build` + `oxlint` bersih
 - [x] Alur web → proxy → backend → Postgres/Redis diverifikasi (login admin nyata)
+
+### Fase 2.2 (bagian web)
+- [x] Halaman `/students/qr-print` (tanpa sidebar): grid kartu = foto/avatar + nama +
+      kelas + **QR dari `qr_token`** (`qrcode.react`), NIS kecil & samar; tombol Cetak →
+      `window.print()` (`@media print` grid `break-inside-avoid`)
+- [x] Aksi baris "Rotasi QR" (konfirmasi) → `POST /admin/students/:id/rotate-qr`
+- [x] `tsc -b` + `vite build` + `oxlint` bersih
