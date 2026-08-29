@@ -6,9 +6,10 @@ Stack: **React 19 · Vite 8 · TypeScript · React Router · Zustand · TanStack
 
 Referensi arsitektur: `../system-design-ekosistem-ekskul-sd.md` (bagian 5.3 — Alur Dashboard Admin).
 
-> **Status: Fase 1.2 + 2.2.** Login nyata + CRUD Data Master (Siswa/Pembina/Ekskul)
-> + **cetak kartu QR siswa & rotasi `qr_token`** (2.2). Halaman lain
-> (dashboard, analitik, relasi ortu, laporan, audit log) masih placeholder.
+> **Status: Fase 1.2 + 2.2 + 2.4.** Login nyata + CRUD Data Master (Siswa/Pembina/Ekskul)
+> + cetak/rotasi kartu QR (2.2) + **halaman Persetujuan Relasi Ortu–Siswa** (2.4:
+> Approve/Reject + alasan, badge SUSPICIOUS). Halaman dashboard/analitik/laporan/audit
+> log masih placeholder.
 
 ## Struktur folder
 
@@ -120,4 +121,12 @@ Alasan:
       kelas + **QR dari `qr_token`** (`qrcode.react`), NIS kecil & samar; tombol Cetak →
       `window.print()` (`@media print` grid `break-inside-avoid`)
 - [x] Aksi baris "Rotasi QR" (konfirmasi) → `POST /admin/students/:id/rotate-qr`
+- [x] `tsc -b` + `vite build` + `oxlint` bersih
+
+### Fase 2.4 (bagian web)
+- [x] Halaman "Persetujuan Relasi": tabel relasi (ortu + relationType + email, no HP,
+      siswa diklaim + kelas + NIS, tgl); filter status PENDING/APPROVED/REJECTED
+- [x] Tombol Setujui / Tolak per baris → `PUT /admin/parent-relations/:id/approve`
+      (`{ decision, reason? }`); Tolak menampilkan prompt alasan opsional
+- [x] Badge kuning **⚠ SUSPICIOUS** bila `row.suspicious` (dari backend)
 - [x] `tsc -b` + `vite build` + `oxlint` bersih
