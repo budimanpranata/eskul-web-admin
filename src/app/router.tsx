@@ -1,7 +1,7 @@
+import { lazy } from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 
 import { AdminLayout } from '@/components/layout/AdminLayout';
-import { AnalyticsPage } from '@/features/analytics/AnalyticsPage';
 import { AuditLogsPage } from '@/features/audit-logs/AuditLogsPage';
 import { LoginPage } from '@/features/auth/LoginPage';
 import { CoachesPage } from '@/features/coaches/CoachesPage';
@@ -12,6 +12,12 @@ import { ReportsPage } from '@/features/reports/ReportsPage';
 import { QrCardsPage } from '@/features/students/QrCardsPage';
 import { StudentsPage } from '@/features/students/StudentsPage';
 import { ProtectedRoute } from './ProtectedRoute';
+
+// Halaman analitik memuat recharts — dipisah ke chunk sendiri agar bundle utama ringan.
+// eslint-disable-next-line react/only-export-components
+const AnalyticsPage = lazy(() =>
+  import('@/features/analytics/AnalyticsPage').then((m) => ({ default: m.AnalyticsPage })),
+);
 
 export const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },

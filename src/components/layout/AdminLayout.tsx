@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 
 import { Toaster } from '@/components/ui';
@@ -64,7 +65,9 @@ export function AdminLayout() {
         </div>
       </aside>
       <main className="flex-1 p-8">
-        <Outlet />
+        <Suspense fallback={<p className="text-sm text-slate-500">Memuat…</p>}>
+          <Outlet />
+        </Suspense>
       </main>
       <Toaster />
     </div>

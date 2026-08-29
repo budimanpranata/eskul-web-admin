@@ -2,14 +2,15 @@
 
 Web Admin Sekolah untuk **Ekosistem Presensi & Perkembangan Ekstrakurikuler SD**.
 
-Stack: **React 19 · Vite 8 · TypeScript · React Router · Zustand · TanStack Query · Tailwind CSS v4**.
+Stack: **React 19 · Vite 8 · TypeScript · React Router · Zustand · TanStack Query · Tailwind CSS v4 · recharts** (analitik).
 
 Referensi arsitektur: `../system-design-ekosistem-ekskul-sd.md` (bagian 5.3 — Alur Dashboard Admin).
 
-> **Status: Fase 1.2 + 2.2 + 2.4 + 3.1.** Login nyata + CRUD Data Master (Siswa/Pembina/Ekskul)
-> + cetak/rotasi kartu QR (2.2) + Persetujuan Relasi Ortu–Siswa (2.4) + **halaman Laporan**
-> (3.1: pratinjau tabel + Export PDF/Excel async dengan polling status & unduh via signed URL).
-> Halaman dashboard/analitik/audit log masih placeholder.
+> **Status: Fase 1.2 + 2.2 + 2.4 + 3.1 + 3.2.** Login nyata + CRUD Data Master
+> (Siswa/Pembina/Ekskul) + cetak/rotasi kartu QR (2.2) + Persetujuan Relasi Ortu–Siswa
+> (2.4) + halaman Laporan (3.1) + **Dashboard Analitik Sekolah** (3.2: KPI, grafik
+> partisipasi per jenis ekskul, tren kehadiran 8 minggu, top-5 kehadiran terendah
+> per ekskul — recharts, chunk terpisah). Halaman dashboard utama/audit log masih placeholder.
 
 ## Struktur folder
 
@@ -30,7 +31,7 @@ web-admin/
 │   │   ├── coaches/            # ✅ CRUD guru pembina (buat akun + password awal)      (1.2)
 │   │   ├── extracurriculars/   # ✅ CRUD ekskul + modal detail: jadwal & anggota      (1.2)
 │   │   ├── dashboard/          # KPI cards                  (Fase 1 lanjutan)
-│   │   ├── analytics/          # dashboard analitik         (Fase 3.2)
+│   │   ├── analytics/          # ✅ dashboard analitik (recharts, lazy-load)  (Fase 3.2)
 │   │   ├── parent-relations/   # ✅ approval relasi ortu    (Fase 2.4)
 │   │   ├── reports/            # ✅ pratinjau + export PDF/Excel async + riwayat  (Fase 3.1)
 │   │   └── audit-logs/         # review audit log           (Fase 4.1)
@@ -138,4 +139,12 @@ Alasan:
       (202), lalu **polling** `GET /admin/reports/exports/:id` sampai `READY`/`FAILED` dengan indikator status
 - [x] Unduh via `downloadUrl` ber-signature dari backend; tabel **Riwayat Export** (auto-refresh)
       menampilkan status + tautan unduh / "tautan kedaluwarsa"
+- [x] `tsc -b` + `vite build` + `oxlint` bersih
+
+### Fase 3.2 (bagian web)
+- [x] Halaman "Dashboard Analitik Sekolah" konsumsi `GET /admin/analytics/overview`:
+      baris KPI + grafik batang partisipasi per jenis ekskul + grafik garis tren
+      kehadiran 8 minggu (recharts) + tabel top-5 kehadiran terendah per ekskul
+- [x] Tombol **Segarkan** (`?fresh=1`) + info "data per … · dari cache / baru dihitung"
+- [x] `recharts` di-`lazy()` → chunk `AnalyticsPage-*.js` terpisah (bundle utama tetap ~440 kB)
 - [x] `tsc -b` + `vite build` + `oxlint` bersih
