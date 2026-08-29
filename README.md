@@ -6,10 +6,10 @@ Stack: **React 19 · Vite 8 · TypeScript · React Router · Zustand · TanStack
 
 Referensi arsitektur: `../system-design-ekosistem-ekskul-sd.md` (bagian 5.3 — Alur Dashboard Admin).
 
-> **Status: Fase 1.2 + 2.2 + 2.4.** Login nyata + CRUD Data Master (Siswa/Pembina/Ekskul)
-> + cetak/rotasi kartu QR (2.2) + **halaman Persetujuan Relasi Ortu–Siswa** (2.4:
-> Approve/Reject + alasan, badge SUSPICIOUS). Halaman dashboard/analitik/laporan/audit
-> log masih placeholder.
+> **Status: Fase 1.2 + 2.2 + 2.4 + 3.1.** Login nyata + CRUD Data Master (Siswa/Pembina/Ekskul)
+> + cetak/rotasi kartu QR (2.2) + Persetujuan Relasi Ortu–Siswa (2.4) + **halaman Laporan**
+> (3.1: pratinjau tabel + Export PDF/Excel async dengan polling status & unduh via signed URL).
+> Halaman dashboard/analitik/audit log masih placeholder.
 
 ## Struktur folder
 
@@ -31,8 +31,8 @@ web-admin/
 │   │   ├── extracurriculars/   # ✅ CRUD ekskul + modal detail: jadwal & anggota      (1.2)
 │   │   ├── dashboard/          # KPI cards                  (Fase 1 lanjutan)
 │   │   ├── analytics/          # dashboard analitik         (Fase 3.2)
-│   │   ├── parent-relations/   # approval relasi ortu       (Fase 2.4)
-│   │   ├── reports/            # export PDF/Excel           (Fase 3.1)
+│   │   ├── parent-relations/   # ✅ approval relasi ortu    (Fase 2.4)
+│   │   ├── reports/            # ✅ pratinjau + export PDF/Excel async + riwayat  (Fase 3.1)
 │   │   └── audit-logs/         # review audit log           (Fase 4.1)
 │   │       └── <feature>/api.ts  # hook TanStack Query per entitas
 │   ├── lib/
@@ -129,4 +129,13 @@ Alasan:
 - [x] Tombol Setujui / Tolak per baris → `PUT /admin/parent-relations/:id/approve`
       (`{ decision, reason? }`); Tolak menampilkan prompt alasan opsional
 - [x] Badge kuning **⚠ SUSPICIOUS** bila `row.suspicious` (dari backend)
+- [x] `tsc -b` + `vite build` + `oxlint` bersih
+
+### Fase 3.1 (bagian web)
+- [x] Halaman "Laporan": filter (kelas, ekskul, rentang tanggal) → **pratinjau tabel**
+      sebelum export (`GET /admin/reports/attendance/preview`, dengan pagination + rentang efektif)
+- [x] Tombol **Export PDF (rapor)** / **Export Excel (data mentah)** → `GET /admin/reports/attendance?format=…`
+      (202), lalu **polling** `GET /admin/reports/exports/:id` sampai `READY`/`FAILED` dengan indikator status
+- [x] Unduh via `downloadUrl` ber-signature dari backend; tabel **Riwayat Export** (auto-refresh)
+      menampilkan status + tautan unduh / "tautan kedaluwarsa"
 - [x] `tsc -b` + `vite build` + `oxlint` bersih
