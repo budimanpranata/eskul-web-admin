@@ -13,11 +13,14 @@ export default defineConfig({
     },
   },
   server: {
-    port: 5173,
+    // 5273 dipilih agar tidak bentrok dengan dev server lain di mesin ini (5173/5174).
+    port: 5273,
+    strictPort: true,
     proxy: {
-      // Proksi ke backend saat development agar tidak kena CORS.
+      // Proksi ke backend saat development agar request /api same-origin (tanpa CORS).
+      // Backend dev berjalan di port 3100 (lihat backend/.env.example).
       '/api': {
-        target: 'http://localhost:3000',
+        target: 'http://localhost:3100',
         changeOrigin: true,
       },
     },

@@ -4,18 +4,19 @@ import { Navigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
 
 /**
- * Guard rute untuk area admin.
- * FASE 0: hanya cek keberadaan token di store. Validasi role ADMIN + refresh
- * token + redirect MFA ditambahkan di Fase 1.1 / 4.2.
+ * Guard area admin: butuh sesi aktif DAN role ADMIN.
+ * (Backend juga menegakkan RBAC di setiap endpoint /admin/*.)
  */
 export function ProtectedRoute({ children }: { children: ReactNode }) {
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated());
+  const { accessToken, user } = useAuthStore();
 
-  // FASE 0: bypass sementara agar UI bisa ditinjau tanpa backend auth.
-  const BYPASS_AUTH = import.meta.env.DEV;
-
-  if (!isAuthenticated && !BYPASS_AUTH) {
-    return <Navigate to="/login" replace />;
+  if (!accessToken) return <Navigate to="/login" replace />;
+  if (user && user.role !== 'ADMIN') {
+    return (
+      <div className="flex min-h-full items-center justify-center p-8 text-center text-slate-600 dark:text-slate-300">
+        Akun ini bukan Administrator. Web Admin hanya untuk role ADMIN.
+      </div>
+    );
   }
   return <>{children}</>;
 }

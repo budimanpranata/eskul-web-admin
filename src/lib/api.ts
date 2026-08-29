@@ -1,14 +1,73 @@
-import axios from 'axios';
+import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios';
+
+import { useAuthStore } from '@/stores/authStore';
 
 /**
  * Klien HTTP terpusat untuk backend eskul.
- * Base URL default relatif ("/api/v1") → di-proxy oleh Vite ke backend saat dev
- * (lihat vite.config.ts), dan di-serve dari domain yang sama saat production.
- *
- * FASE 0: hanya instance dasar. Interceptor auth (inject Bearer token,
- * auto-refresh saat 401) ditambahkan di Fase 1.1.
+ * - Menyisipkan `Authorization: Bearer <accessToken>` dari authStore.
+ * - Pada 401, mencoba `POST /auth/refresh` sekali; bila gagal → bersihkan sesi.
  */
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL ?? '/api/v1',
-  timeout: 15_000,
+  timeout: 20_000,
 });
+
+api.interceptors.request.use((config) => {
+  const token = useAuthStore.getState().accessToken;
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
+let refreshing: Promise<string | null> | null = null;
+
+async function runRefresh(): Promise<string | null> {
+  const { refreshToken, setSession, clearSession } = useAuthStore.getState();
+  if (!refreshToken) {
+    clearSession();
+    return null;
+  }
+  try {
+    const { data } = await axios.post(`${api.defaults.baseURL}/auth/refresh`, { refreshToken });
+    setSession({
+      accessToken: data.accessToken,
+      refreshToken: data.refreshToken,
+      user: data.user,
+    });
+    return data.accessToken as string;
+  } catch {
+    clearSession();
+    return null;
+  }
+}
+
+api.interceptors.response.use(
+  (res) => res,
+  async (error: AxiosError) => {
+    const original = error.config as (InternalAxiosRequestConfig & { _retried?: boolean }) | undefined;
+    const status = error.response?.status;
+    const isAuthCall = original?.url?.includes('/auth/');
+
+    if (status === 401 && original && !original._retried && !isAuthCall) {
+      original._retried = true;
+      refreshing ??= runRefresh().finally(() => {
+        refreshing = null;
+      });
+      const newToken = await refreshing;
+      if (newToken) {
+        original.headers.Authorization = `Bearer ${newToken}`;
+        return api(original);
+      }
+    }
+    return Promise.reject(error);
+  },
+);
+
+/** Ekstrak pesan error backend (NestJS: { message: string | string[] }). */
+export function apiErrorMessage(err: unknown, fallback = 'Terjadi kesalahan.'): string {
+  if (err instanceof AxiosError) {
+    const m = err.response?.data?.message;
+    if (Array.isArray(m)) return m.join(', ');
+    if (typeof m === 'string') return m;
+  }
+  return fallback;
+}

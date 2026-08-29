@@ -6,8 +6,9 @@ Stack: **React 19 · Vite 8 · TypeScript · React Router · Zustand · TanStack
 
 Referensi arsitektur: `../system-design-ekosistem-ekskul-sd.md` (bagian 5.3 — Alur Dashboard Admin).
 
-> **Status: Fase 0 (scaffolding).** Struktur, routing, styling, dan data layer sudah
-> terpasang. Semua halaman masih placeholder — diisi pada fase masing-masing.
+> **Status: Fase 1.2.** Login nyata + halaman CRUD Data Master (Siswa, Guru Pembina,
+> Ekskul + Jadwal + Anggota) sudah berfungsi terhadap backend. Halaman lain
+> (dashboard, analitik, relasi ortu, laporan, audit log) masih placeholder.
 
 ## Struktur folder
 
@@ -19,23 +20,27 @@ web-admin/
 │   │   ├── queryClient.ts      # instance TanStack Query
 │   │   └── ProtectedRoute.tsx  # guard area admin
 │   ├── components/
-│   │   ├── layout/AdminLayout.tsx  # shell sidebar + konten
+│   │   ├── layout/AdminLayout.tsx  # shell sidebar + user + logout + <Toaster/>
+│   │   ├── ui.tsx                  # Button/Field/Modal/Pagination/TableShell/Badge/Toaster
 │   │   └── PagePlaceholder.tsx
 │   ├── features/
-│   │   ├── auth/               # LoginPage                 (Fase 1.1)
-│   │   ├── dashboard/          # KPI cards                  (Fase 1)
+│   │   ├── auth/               # ✅ LoginPage (POST /auth/login, cek role ADMIN)
+│   │   ├── students/           # ✅ tabel+filter+pagination, CRUD modal, import Excel  (1.2)
+│   │   ├── coaches/            # ✅ CRUD guru pembina (buat akun + password awal)      (1.2)
+│   │   ├── extracurriculars/   # ✅ CRUD ekskul + modal detail: jadwal & anggota      (1.2)
+│   │   ├── dashboard/          # KPI cards                  (Fase 1 lanjutan)
 │   │   ├── analytics/          # dashboard analitik         (Fase 3.2)
-│   │   ├── students/           # CRUD siswa + import Excel  (Fase 1.2 / 2.2)
-│   │   ├── coaches/            # CRUD guru pembina          (Fase 1.2)
-│   │   ├── extracurriculars/   # CRUD ekskul & jadwal       (Fase 1.2)
 │   │   ├── parent-relations/   # approval relasi ortu       (Fase 2.4)
 │   │   ├── reports/            # export PDF/Excel           (Fase 3.1)
 │   │   └── audit-logs/         # review audit log           (Fase 4.1)
-│   ├── lib/api.ts              # axios instance ke backend
-│   ├── stores/authStore.ts    # Zustand — client state auth
-│   ├── index.css              # @import "tailwindcss"
-│   └── main.tsx               # Query + Router provider
-├── vite.config.ts             # alias @/* , proxy /api → localhost:3000, Tailwind plugin
+│   │       └── <feature>/api.ts  # hook TanStack Query per entitas
+│   ├── lib/
+│   │   ├── api.ts             # axios + interceptor Bearer + auto-refresh saat 401
+│   │   ├── toast.ts           # store notifikasi ringan
+│   │   └── types.ts          # tipe response backend
+│   ├── stores/authStore.ts   # Zustand persist — accessToken/refreshToken/user
+│   └── main.tsx              # Query + Router provider
+├── vite.config.ts            # alias @/* , port 5273, proxy /api → localhost:3100
 └── .env.example
 ```
 
@@ -50,17 +55,18 @@ npm install
 npm run dev
 ```
 
-Buka <http://localhost:5173>. Request ke `/api/*` otomatis di-proxy ke backend
-di `http://localhost:3000` (jalankan `eskul-backend` di terminal terpisah).
+Buka <http://localhost:5273>. Request ke `/api/*` otomatis di-proxy ke backend
+di `http://localhost:3100` (jalankan `eskul-backend` di terminal terpisah, plus
+`docker compose up -d postgres redis` + `prisma migrate deploy` + `db:seed`).
 
-> Saat `npm run dev`, `ProtectedRoute` sengaja mem-bypass auth (`import.meta.env.DEV`)
-> supaya UI bisa ditinjau sebelum modul auth backend siap. Bypass ini dicabut di Fase 1.1.
+Login dengan akun admin hasil seed: `admin@eskul.test` / `Admin#12345`.
+`ProtectedRoute` kini menuntut sesi nyata + role `ADMIN` (tidak ada lagi bypass dev).
 
 ## Skrip npm
 
 | Skrip | Fungsi |
 |---|---|
-| `npm run dev` | Dev server (port 5173) |
+| `npm run dev` | Dev server (port 5273) |
 | `npm run build` | Type-check (`tsc -b`) + build produksi |
 | `npm run preview` | Preview hasil build |
 | `npm run lint` | oxlint |
@@ -91,10 +97,20 @@ Alasan:
    scope dashboard CRUD + laporan ini, kombinasi Zustand + TanStack Query lebih
    proporsional.
 
-## Definition of Done (Fase 0.1)
+## Definition of Done
 
+### Fase 0.1
 - [x] `npm run dev` menjalankan SPA tanpa error
 - [x] Routing (react-router) mencakup seluruh menu dari dokumen desain bagian 5.3
 - [x] State management ditentukan (Zustand + TanStack Query) beserta alasannya
 - [x] Tailwind aktif untuk styling
-- [ ] Diverifikasi jalan setelah `npm install` (butuh jaringan untuk unduh dependency)
+
+### Fase 1.2 (bagian web)
+- [x] Halaman Siswa/Pembina/Ekskul: tabel + pagination + search + filter
+      (kelas untuk siswa, kategori untuk ekskul), form create/edit dengan
+      validasi client-side, nonaktif/aktifkan
+- [x] Import siswa massal dari `.xlsx` dengan ringkasan hasil (dibuat/dilewati/error)
+- [x] Modal detail ekskul: kelola jadwal (+deteksi bentrok dari backend) & anggota
+      (cari siswa, daftarkan/keluarkan, cek kapasitas dari backend)
+- [x] `tsc -b` + `vite build` + `oxlint` bersih
+- [x] Alur web → proxy → backend → Postgres/Redis diverifikasi (login admin nyata)
