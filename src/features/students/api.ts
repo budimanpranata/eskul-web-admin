@@ -65,6 +65,33 @@ export function useToggleStudentActive() {
   });
 }
 
+export function useRotateQr() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api.post<Student>(`/admin/students/${id}/rotate-qr`).then((r) => r.data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: [KEY] }),
+  });
+}
+
+/** Ambil semua siswa (untuk halaman cetak kartu QR), tanpa pagination UI. */
+export function useStudentsForPrint(params: { search?: string; classGrade?: string }) {
+  return useQuery({
+    queryKey: [KEY, 'print', params],
+    queryFn: async () => {
+      const { data } = await api.get<Paginated<Student>>('/admin/students', {
+        params: {
+          page: 1,
+          pageSize: 100,
+          isActive: 'true',
+          search: params.search || undefined,
+          classGrade: params.classGrade || undefined,
+        },
+      });
+      return data.data;
+    },
+  });
+}
+
 export function useImportStudents() {
   const qc = useQueryClient();
   return useMutation({

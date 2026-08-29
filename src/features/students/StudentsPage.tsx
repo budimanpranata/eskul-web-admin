@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import {
   Badge,
@@ -16,6 +17,7 @@ import type { Student } from '@/lib/types';
 import {
   useCreateStudent,
   useImportStudents,
+  useRotateQr,
   useStudents,
   useToggleStudentActive,
   useUpdateStudent,
@@ -38,6 +40,15 @@ export function StudentsPage() {
   );
   const { data, isLoading, isError, error } = useStudents(params);
   const toggle = useToggleStudentActive();
+  const rotateQr = useRotateQr();
+  const navigate = useNavigate();
+
+  function openPrint() {
+    const qs = new URLSearchParams();
+    if (classGrade) qs.set('classGrade', classGrade);
+    if (search) qs.set('search', search);
+    navigate(`/students/qr-print?${qs.toString()}`);
+  }
 
   const classes = useMemo(() => {
     const s = new Set<string>();
@@ -50,6 +61,9 @@ export function StudentsPage() {
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold text-slate-800 dark:text-slate-100">Data Master — Siswa</h1>
         <div className="flex gap-2">
+          <Button variant="secondary" onClick={openPrint}>
+            Cetak Kartu QR
+          </Button>
           <Button variant="secondary" onClick={() => setImporting(true)}>
             Import Excel
           </Button>
@@ -133,6 +147,19 @@ export function StudentsPage() {
                   <div className="flex justify-end gap-1">
                     <Button variant="ghost" onClick={() => setEditing(s)}>
                       Edit
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      onClick={() => {
+                        if (!confirm(`Rotasi QR untuk ${s.fullName}? Kartu QR lama akan tidak berlaku.`))
+                          return;
+                        rotateQr.mutate(s.id, {
+                          onSuccess: () => toast.success('QR token dirotasi. Cetak kartu baru.'),
+                          onError: (e) => toast.error(apiErrorMessage(e)),
+                        });
+                      }}
+                    >
+                      Rotasi QR
                     </Button>
                     <Button
                       variant="ghost"

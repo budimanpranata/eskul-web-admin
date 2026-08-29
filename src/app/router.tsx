@@ -9,11 +9,23 @@ import { DashboardPage } from '@/features/dashboard/DashboardPage';
 import { ExtracurricularsPage } from '@/features/extracurriculars/ExtracurricularsPage';
 import { ParentRelationsPage } from '@/features/parent-relations/ParentRelationsPage';
 import { ReportsPage } from '@/features/reports/ReportsPage';
+import { QrCardsPage } from '@/features/students/QrCardsPage';
 import { StudentsPage } from '@/features/students/StudentsPage';
 import { ProtectedRoute } from './ProtectedRoute';
 
 export const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
+  {
+    // Halaman cetak — tanpa sidebar agar bersih saat di-print.
+    path: '/students/qr-print',
+    element: (
+      <ProtectedRoute>
+        <div className="min-h-full bg-white p-6">
+          <QrCardsPage />
+        </div>
+      </ProtectedRoute>
+    ),
+  },
   {
     path: '/',
     element: (

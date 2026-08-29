@@ -62,10 +62,20 @@ api.interceptors.response.use(
   },
 );
 
-/** Ekstrak pesan error backend (NestJS: { message: string | string[] }). */
+/**
+ * Ekstrak pesan error backend.
+ * - HttpException biasa: `{ message: string | string[] }`
+ * - Error validasi: `{ error: 'VALIDATION_ERROR', details: [{ field, message }] }`
+ */
 export function apiErrorMessage(err: unknown, fallback = 'Terjadi kesalahan.'): string {
   if (err instanceof AxiosError) {
-    const m = err.response?.data?.message;
+    const data = err.response?.data;
+    if (data?.error === 'VALIDATION_ERROR' && Array.isArray(data.details)) {
+      return data.details
+        .map((d: { field: string; message: string }) => `${d.field}: ${d.message}`)
+        .join('\n');
+    }
+    const m = data?.message;
     if (Array.isArray(m)) return m.join(', ');
     if (typeof m === 'string') return m;
   }
