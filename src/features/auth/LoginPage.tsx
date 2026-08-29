@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { api, apiErrorMessage } from '@/lib/api';
-import { useAuthStore } from '@/stores/authStore';
+import { isAdminRole, useAuthStore } from '@/stores/authStore';
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -18,7 +18,7 @@ export function LoginPage() {
     setLoading(true);
     try {
       const { data } = await api.post('/auth/login', { identifier, password });
-      if (data.user.role !== 'ADMIN') {
+      if (!isAdminRole(data.user.role)) {
         setError('Akun ini bukan Administrator.');
         return;
       }

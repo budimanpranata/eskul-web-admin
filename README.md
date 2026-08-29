@@ -6,11 +6,11 @@ Stack: **React 19 · Vite 8 · TypeScript · React Router · Zustand · TanStack
 
 Referensi arsitektur: `../system-design-ekosistem-ekskul-sd.md` (bagian 5.3 — Alur Dashboard Admin).
 
-> **Status: Fase 1.2 + 2.2 + 2.4 + 3.1 + 3.2.** Login nyata + CRUD Data Master
+> **Status: Fase 1.2 + 2.2 + 2.4 + 3.1 + 3.2 + 4.1.** Login nyata + CRUD Data Master
 > (Siswa/Pembina/Ekskul) + cetak/rotasi kartu QR (2.2) + Persetujuan Relasi Ortu–Siswa
-> (2.4) + halaman Laporan (3.1) + **Dashboard Analitik Sekolah** (3.2: KPI, grafik
-> partisipasi per jenis ekskul, tren kehadiran 8 minggu, top-5 kehadiran terendah
-> per ekskul — recharts, chunk terpisah). Halaman dashboard utama/audit log masih placeholder.
+> (2.4) + halaman Laporan (3.1) + Dashboard Analitik Sekolah (3.2) + **halaman Audit Log**
+> (4.1: filter user/action/entity/tanggal + free-text metadata, read-only, khusus
+> role `ADMIN_SUPER`). Halaman dashboard utama masih placeholder.
 
 ## Struktur folder
 
@@ -34,7 +34,7 @@ web-admin/
 │   │   ├── analytics/          # ✅ dashboard analitik (recharts, lazy-load)  (Fase 3.2)
 │   │   ├── parent-relations/   # ✅ approval relasi ortu    (Fase 2.4)
 │   │   ├── reports/            # ✅ pratinjau + export PDF/Excel async + riwayat  (Fase 3.1)
-│   │   └── audit-logs/         # review audit log           (Fase 4.1)
+│   │   └── audit-logs/         # ✅ review audit log (ADMIN_SUPER, read-only)  (Fase 4.1)
 │   │       └── <feature>/api.ts  # hook TanStack Query per entitas
 │   ├── lib/
 │   │   ├── api.ts             # axios + interceptor Bearer + auto-refresh saat 401
@@ -61,8 +61,9 @@ Buka <http://localhost:5273>. Request ke `/api/*` otomatis di-proxy ke backend
 di `http://localhost:3100` (jalankan `eskul-backend` di terminal terpisah, plus
 `docker compose up -d postgres redis` + `prisma migrate deploy` + `db:seed`).
 
-Login dengan akun admin hasil seed: `admin@eskul.test` / `Admin#12345`.
-`ProtectedRoute` kini menuntut sesi nyata + role `ADMIN` (tidak ada lagi bypass dev).
+Login dengan akun seed: `admin@eskul.test` / `Admin#12345` (role `ADMIN`) atau
+`superadmin@eskul.test` / `Super#12345` (role `ADMIN_SUPER` — plus menu **Audit Log**).
+`ProtectedRoute` menuntut sesi nyata + role admin (`ADMIN` atau `ADMIN_SUPER`).
 
 ## Skrip npm
 
@@ -147,4 +148,14 @@ Alasan:
       kehadiran 8 minggu (recharts) + tabel top-5 kehadiran terendah per ekskul
 - [x] Tombol **Segarkan** (`?fresh=1`) + info "data per … · dari cache / baru dihitung"
 - [x] `recharts` di-`lazy()` → chunk `AnalyticsPage-*.js` terpisah (bundle utama tetap ~440 kB)
+- [x] `tsc -b` + `vite build` + `oxlint` bersih
+
+### Fase 4.1 (bagian web)
+- [x] Halaman "Audit Log" (`/audit-logs`): tabel waktu / user / action / entity / IP /
+      hasil (ok · error N) + modal detail (metadata JSON pretty-print)
+- [x] Filter: free-text `q` (action / metadata JSONB / nama-email user), action &
+      entity type (dari `GET /admin/audit-logs/facets`), user ID, rentang tanggal; pagination
+- [x] Read-only + sub-permission: menu & halaman hanya untuk `role === 'ADMIN_SUPER'`
+      (pesan jelas untuk `ADMIN` biasa; backend tetap 403). `AuthUser.role` + `isAdminRole()`
+      diperluas ke `ADMIN_SUPER` di `authStore` / `LoginPage` / `ProtectedRoute`
 - [x] `tsc -b` + `vite build` + `oxlint` bersih

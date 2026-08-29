@@ -1,11 +1,17 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+export type UserRole = 'ADMIN_SUPER' | 'ADMIN' | 'PEMBINA' | 'ORANGTUA';
+
 export interface AuthUser {
   id: string;
   fullName: string;
-  role: 'ADMIN' | 'PEMBINA' | 'ORANGTUA';
+  role: UserRole;
 }
+
+/** Role yang boleh masuk Web Admin (ADMIN_SUPER = ADMIN + akses audit log). */
+export const isAdminRole = (role?: UserRole): boolean =>
+  role === 'ADMIN' || role === 'ADMIN_SUPER';
 
 interface AuthState {
   accessToken: string | null;
