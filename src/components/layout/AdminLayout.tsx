@@ -13,6 +13,7 @@ const NAV: { to: string; label: string; end?: boolean; superOnly?: boolean }[] =
   { to: '/extracurriculars', label: 'Ekskul & Jadwal' },
   { to: '/parent-relations', label: 'Persetujuan Relasi Ortu' },
   { to: '/reports', label: 'Laporan' },
+  { to: '/security', label: 'Keamanan (MFA)' },
   // Audit Log: hanya untuk ADMIN_SUPER (backend menegakkan 403 juga).
   { to: '/audit-logs', label: 'Audit Log', superOnly: true },
 ];

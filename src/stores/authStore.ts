@@ -17,8 +17,16 @@ interface AuthState {
   accessToken: string | null;
   refreshToken: string | null;
   user: AuthUser | null;
+  /** true → admin wajib menyelesaikan setup MFA sebelum halaman lain terbuka. */
+  mfaSetupRequired: boolean;
   isAuthenticated: () => boolean;
-  setSession: (p: { accessToken: string; refreshToken: string; user: AuthUser }) => void;
+  setSession: (p: {
+    accessToken: string;
+    refreshToken: string;
+    user: AuthUser;
+    mfaSetupRequired?: boolean;
+  }) => void;
+  clearMfaSetupRequired: () => void;
   clearSession: () => void;
 }
 
@@ -34,10 +42,13 @@ export const useAuthStore = create<AuthState>()(
       accessToken: null,
       refreshToken: null,
       user: null,
+      mfaSetupRequired: false,
       isAuthenticated: () => Boolean(get().accessToken),
-      setSession: ({ accessToken, refreshToken, user }) =>
-        set({ accessToken, refreshToken, user }),
-      clearSession: () => set({ accessToken: null, refreshToken: null, user: null }),
+      setSession: ({ accessToken, refreshToken, user, mfaSetupRequired = false }) =>
+        set({ accessToken, refreshToken, user, mfaSetupRequired }),
+      clearMfaSetupRequired: () => set({ mfaSetupRequired: false }),
+      clearSession: () =>
+        set({ accessToken: null, refreshToken: null, user: null, mfaSetupRequired: false }),
     }),
     { name: 'eskul-admin-auth' },
   ),

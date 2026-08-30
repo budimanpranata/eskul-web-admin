@@ -6,11 +6,11 @@ Stack: **React 19 · Vite 8 · TypeScript · React Router · Zustand · TanStack
 
 Referensi arsitektur: `../system-design-ekosistem-ekskul-sd.md` (bagian 5.3 — Alur Dashboard Admin).
 
-> **Status: Fase 1.2 + 2.2 + 2.4 + 3.1 + 3.2 + 4.1.** Login nyata + CRUD Data Master
-> (Siswa/Pembina/Ekskul) + cetak/rotasi kartu QR (2.2) + Persetujuan Relasi Ortu–Siswa
-> (2.4) + halaman Laporan (3.1) + Dashboard Analitik Sekolah (3.2) + **halaman Audit Log**
-> (4.1: filter user/action/entity/tanggal + free-text metadata, read-only, khusus
-> role `ADMIN_SUPER`). Halaman dashboard utama masih placeholder.
+> **Status: Fase 1.2 + 2.2 + 2.4 + 3.1 + 3.2 + 4.1 + 4.2.** Login nyata + CRUD Data Master
+> (Siswa/Pembina/Ekskul) + cetak/rotasi kartu QR + Persetujuan Relasi Ortu–Siswa +
+> halaman Laporan + Dashboard Analitik + halaman Audit Log (`ADMIN_SUPER`) +
+> **login 2 langkah & halaman Keamanan/MFA** (4.2: setup TOTP + QR, kode pemulihan,
+> setup wajib bila `MFA_SETUP_REQUIRED`). Halaman dashboard utama masih placeholder.
 
 ## Struktur folder
 
@@ -26,7 +26,8 @@ web-admin/
 │   │   ├── ui.tsx                  # Button/Field/Modal/Pagination/TableShell/Badge/Toaster
 │   │   └── PagePlaceholder.tsx
 │   ├── features/
-│   │   ├── auth/               # ✅ LoginPage (POST /auth/login, cek role ADMIN)
+│   │   ├── auth/               # ✅ LoginPage (login 2 langkah: password → kode MFA)
+│   │   ├── security/           # ✅ SecurityPage + MfaSetupPage (TOTP + QR + recovery codes)  (Fase 4.2)
 │   │   ├── students/           # ✅ tabel+filter+pagination, CRUD modal, import Excel  (1.2)
 │   │   ├── coaches/            # ✅ CRUD guru pembina (buat akun + password awal)      (1.2)
 │   │   ├── extracurriculars/   # ✅ CRUD ekskul + modal detail: jadwal & anggota      (1.2)
@@ -64,6 +65,9 @@ di `http://localhost:3100` (jalankan `eskul-backend` di terminal terpisah, plus
 Login dengan akun seed: `admin@eskul.test` / `Admin#12345` (role `ADMIN`) atau
 `superadmin@eskul.test` / `Super#12345` (role `ADMIN_SUPER` — plus menu **Audit Log**).
 `ProtectedRoute` menuntut sesi nyata + role admin (`ADMIN` atau `ADMIN_SUPER`).
+
+Bila backend `MFA_ENFORCE_ADMIN=true`, login admin pertama kali dialihkan ke
+`/security/mfa-setup` (wajib aktifkan MFA sebelum halaman lain terbuka).
 
 ## Skrip npm
 
@@ -158,4 +162,16 @@ Alasan:
 - [x] Read-only + sub-permission: menu & halaman hanya untuk `role === 'ADMIN_SUPER'`
       (pesan jelas untuk `ADMIN` biasa; backend tetap 403). `AuthUser.role` + `isAdminRole()`
       diperluas ke `ADMIN_SUPER` di `authStore` / `LoginPage` / `ProtectedRoute`
+- [x] `tsc -b` + `vite build` + `oxlint` bersih
+
+### Fase 4.2 (bagian web)
+- [x] `LoginPage` 2 tahap: submit password → bila `mfaRequired`, tampil input kode →
+      `POST /auth/login/mfa`; bila `mfaSetupRequired` → redirect `/security/mfa-setup`
+- [x] `MfaSetupPage` (`/security/mfa-setup`, tanpa sidebar): `POST /auth/mfa/setup` →
+      **QR** (`qrcode.react` dari `otpauthUrl`) + kunci manual → input kode → `enable` →
+      simpan sesi baru + tampilkan **10 kode pemulihan** (tombol salin) → lanjut ke dashboard
+- [x] `SecurityPage` (`/security`, menu "Keamanan (MFA)"): status MFA + tombol aktifkan /
+      nonaktifkan (prompt kode) / buat ulang kode pemulihan
+- [x] `ProtectedRoute` `allowMfaPending` + `authStore.mfaSetupRequired`; interceptor axios
+      menangani 403 `MFA_SETUP_REQUIRED` → arahkan ke halaman setup
 - [x] `tsc -b` + `vite build` + `oxlint` bersih

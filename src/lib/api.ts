@@ -47,6 +47,18 @@ api.interceptors.response.use(
     const status = error.response?.status;
     const isAuthCall = original?.url?.includes('/auth/');
 
+    // Kebijakan MFA (Fase 4.2): admin belum setup MFA → arahkan ke halaman setup.
+    if (
+      status === 403 &&
+      (error.response?.data as { error?: string } | undefined)?.error === 'MFA_SETUP_REQUIRED'
+    ) {
+      useAuthStore.setState({ mfaSetupRequired: true });
+      if (!window.location.pathname.startsWith('/security/mfa-setup')) {
+        window.location.assign('/security/mfa-setup');
+      }
+      return Promise.reject(error);
+    }
+
     if (status === 401 && original && !original._retried && !isAuthCall) {
       original._retried = true;
       refreshing ??= runRefresh().finally(() => {

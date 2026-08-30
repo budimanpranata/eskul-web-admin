@@ -9,6 +9,8 @@ import { DashboardPage } from '@/features/dashboard/DashboardPage';
 import { ExtracurricularsPage } from '@/features/extracurriculars/ExtracurricularsPage';
 import { ParentRelationsPage } from '@/features/parent-relations/ParentRelationsPage';
 import { ReportsPage } from '@/features/reports/ReportsPage';
+import { MfaSetupPage } from '@/features/security/MfaSetupPage';
+import { SecurityPage } from '@/features/security/SecurityPage';
 import { QrCardsPage } from '@/features/students/QrCardsPage';
 import { StudentsPage } from '@/features/students/StudentsPage';
 import { ProtectedRoute } from './ProtectedRoute';
@@ -33,6 +35,17 @@ export const router = createBrowserRouter([
     ),
   },
   {
+    // Setup MFA — tanpa sidebar; boleh diakses walau MFA masih "pending".
+    path: '/security/mfa-setup',
+    element: (
+      <ProtectedRoute allowMfaPending>
+        <div className="min-h-full bg-slate-100 px-6 dark:bg-slate-950">
+          <MfaSetupPage />
+        </div>
+      </ProtectedRoute>
+    ),
+  },
+  {
     path: '/',
     element: (
       <ProtectedRoute>
@@ -47,6 +60,7 @@ export const router = createBrowserRouter([
       { path: 'extracurriculars', element: <ExtracurricularsPage /> },
       { path: 'parent-relations', element: <ParentRelationsPage /> },
       { path: 'reports', element: <ReportsPage /> },
+      { path: 'security', element: <SecurityPage /> },
       { path: 'audit-logs', element: <AuditLogsPage /> },
     ],
   },
