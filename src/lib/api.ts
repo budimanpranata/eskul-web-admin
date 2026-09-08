@@ -8,7 +8,9 @@ import { useAuthStore } from '@/stores/authStore';
  * - Pada 401, mencoba `POST /auth/refresh` sekali; bila gagal → bersihkan sesi.
  */
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL ?? '/api/v1',
+  // `||` bukan `??`: VITE_API_BASE_URL yang ada tapi kosong ("") harus tetap
+  // jatuh ke default same-origin, bukan jadi baseURL kosong.
+  baseURL: import.meta.env.VITE_API_BASE_URL || '/api/v1',
   timeout: 20_000,
 });
 
