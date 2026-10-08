@@ -68,6 +68,17 @@ export interface MemberItem {
   student: { id: string; nis: string; fullName: string; classGrade: string; isActive: boolean };
 }
 
+export interface School {
+  id: string;
+  code: string;
+  name: string;
+  isActive: boolean;
+  createdAt: string;
+  userCount: number;
+  studentCount: number;
+  extracurricularCount: number;
+}
+
 export const DAY_OPTIONS = [
   { value: 1, label: 'Senin' },
   { value: 2, label: 'Selasa' },

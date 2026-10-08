@@ -52,7 +52,13 @@ export function Select(props: SelectHTMLAttributes<HTMLSelectElement>) {
 }
 
 /* ---------- Badge ---------- */
-export function Badge({ active }: { active: boolean }) {
+export function Badge({
+  active,
+  labels,
+}: {
+  active: boolean;
+  labels?: { on: string; off: string };
+}) {
   return (
     <span
       className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
@@ -61,7 +67,7 @@ export function Badge({ active }: { active: boolean }) {
           : 'bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300'
       }`}
     >
-      {active ? 'Aktif' : 'Nonaktif'}
+      {active ? (labels?.on ?? 'Aktif') : (labels?.off ?? 'Nonaktif')}
     </span>
   );
 }

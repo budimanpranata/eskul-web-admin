@@ -14,8 +14,9 @@ const NAV: { to: string; label: string; end?: boolean; superOnly?: boolean }[] =
   { to: '/parent-relations', label: 'Persetujuan Relasi Ortu' },
   { to: '/reports', label: 'Laporan' },
   { to: '/security', label: 'Keamanan (MFA)' },
-  // Audit Log: hanya untuk ADMIN_SUPER (backend menegakkan 403 juga).
+  // Audit Log & Kelola Sekolah: hanya untuk ADMIN_SUPER (backend menegakkan 403 juga).
   { to: '/audit-logs', label: 'Audit Log', superOnly: true },
+  { to: '/schools', label: 'Kelola Sekolah', superOnly: true },
 ];
 
 export function AdminLayout() {

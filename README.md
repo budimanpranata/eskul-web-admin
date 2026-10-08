@@ -6,11 +6,14 @@ Stack: **React 19 · Vite 8 · TypeScript · React Router · Zustand · TanStack
 
 Referensi arsitektur: `../system-design-ekosistem-ekskul-sd.md` (bagian 5.3 — Alur Dashboard Admin).
 
-> **Status: Fase 1.2 + 2.2 + 2.4 + 3.1 + 3.2 + 4.1 + 4.2.** Login nyata + CRUD Data Master
-> (Siswa/Pembina/Ekskul) + cetak/rotasi kartu QR + Persetujuan Relasi Ortu–Siswa +
-> halaman Laporan + Dashboard Analitik + halaman Audit Log (`ADMIN_SUPER`) +
-> **login 2 langkah & halaman Keamanan/MFA** (4.2: setup TOTP + QR, kode pemulihan,
-> setup wajib bila `MFA_SETUP_REQUIRED`). Halaman dashboard utama masih placeholder.
+> **Status: Fase 1.2 + 2.2 + 2.4 + 3.1 + 3.2 + 4.1 + 4.2 + multi-tenant (beyond-plan).**
+> Login nyata + CRUD Data Master (Siswa/Pembina/Ekskul) + cetak/rotasi kartu QR +
+> Persetujuan Relasi Ortu–Siswa + halaman Laporan + Dashboard Analitik + halaman Audit
+> Log (`ADMIN_SUPER`) + **login 2 langkah & halaman Keamanan/MFA** (4.2: setup TOTP +
+> QR, kode pemulihan, setup wajib bila `MFA_SETUP_REQUIRED`) + **halaman Kelola
+> Sekolah** (`ADMIN_SUPER` — daftarkan sekolah baru + admin pertamanya; setiap sekolah
+> terisolasi penuh dari sekolah lain, lihat `backend/MULTI-TENANT.md`). Halaman
+> dashboard utama masih placeholder.
 
 ## Struktur folder
 
@@ -35,7 +38,8 @@ web-admin/
 │   │   ├── analytics/          # ✅ dashboard analitik (recharts, lazy-load)  (Fase 3.2)
 │   │   ├── parent-relations/   # ✅ approval relasi ortu    (Fase 2.4)
 │   │   ├── reports/            # ✅ pratinjau + export PDF/Excel async + riwayat  (Fase 3.1)
-│   │   └── audit-logs/         # ✅ review audit log (ADMIN_SUPER, read-only)  (Fase 4.1)
+│   │   ├── audit-logs/         # ✅ review audit log (ADMIN_SUPER, read-only)  (Fase 4.1)
+│   │   └── schools/            # ✅ Kelola Sekolah (ADMIN_SUPER) — daftar/suspend/resume/+admin  (beyond-plan)
 │   │       └── <feature>/api.ts  # hook TanStack Query per entitas
 │   ├── lib/
 │   │   ├── api.ts             # axios + interceptor Bearer + auto-refresh saat 401
