@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { api, apiErrorMessage } from '@/lib/api';
+import { useBranding } from '@/features/settings/api';
 import { isAdminRole, useAuthStore } from '@/stores/authStore';
 
 const inputCls =
@@ -10,6 +11,11 @@ const inputCls =
 export function LoginPage() {
   const navigate = useNavigate();
   const setSession = useAuthStore((s) => s.setSession);
+  // Publik, aman gagal diam-diam — fallback bawaan (logo default + 'Eskul')
+  // kalau request ini gagal (offline saat pertama buka, dll).
+  const { data: branding } = useBranding();
+  const appName = branding?.appName ?? 'Eskul';
+  const logoUrl = branding?.logoUrl ?? '/logo-default.png';
 
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
@@ -79,8 +85,16 @@ export function LoginPage() {
           onSubmit={onSubmitPassword}
           className="w-full max-w-sm rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900"
         >
-          <h1 className="text-xl font-semibold text-slate-800 dark:text-slate-100">
-            Masuk — Admin Ekskul SD
+          <img
+            src={logoUrl}
+            alt={appName}
+            className="mx-auto mb-4 h-16 w-16 object-contain"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = '/logo-default.png';
+            }}
+          />
+          <h1 className="text-center text-xl font-semibold text-slate-800 dark:text-slate-100">
+            Masuk — Admin {appName}
           </h1>
           <label className="mt-5 block text-sm font-medium text-slate-700 dark:text-slate-300">
             Email / No. HP

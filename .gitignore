@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Aset sumber mentah (bukan yang diserve) — versi optimized ada di public/.
+/assets/

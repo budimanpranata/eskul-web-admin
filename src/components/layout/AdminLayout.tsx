@@ -18,6 +18,7 @@ const NAV: { to: string; label: string; end?: boolean; superOnly?: boolean }[] =
   // Audit Log & Kelola Sekolah: hanya untuk ADMIN_SUPER (backend menegakkan 403 juga).
   { to: '/audit-logs', label: 'Audit Log', superOnly: true },
   { to: '/schools', label: 'Kelola Sekolah', superOnly: true },
+  { to: '/app-settings', label: 'Pengaturan Tampilan', superOnly: true },
 ];
 
 export function AdminLayout() {

@@ -11,6 +11,7 @@ import { ExtracurricularsPage } from '@/features/extracurriculars/Extracurricula
 import { ParentRelationsPage } from '@/features/parent-relations/ParentRelationsPage';
 import { ReportsPage } from '@/features/reports/ReportsPage';
 import { SchoolsPage } from '@/features/schools/SchoolsPage';
+import { SettingsPage } from '@/features/settings/SettingsPage';
 import { MfaSetupPage } from '@/features/security/MfaSetupPage';
 import { SecurityPage } from '@/features/security/SecurityPage';
 import { QrCardsPage } from '@/features/students/QrCardsPage';
@@ -66,6 +67,7 @@ export const router = createBrowserRouter([
       { path: 'security', element: <SecurityPage /> },
       { path: 'audit-logs', element: <AuditLogsPage /> },
       { path: 'schools', element: <SchoolsPage /> },
+      { path: 'app-settings', element: <SettingsPage /> },
     ],
   },
 ]);
