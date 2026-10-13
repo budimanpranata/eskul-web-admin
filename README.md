@@ -12,7 +12,9 @@ Referensi arsitektur: `../system-design-ekosistem-ekskul-sd.md` (bagian 5.3 — 
 > Log (`ADMIN_SUPER`) + **login 2 langkah & halaman Keamanan/MFA** (4.2: setup TOTP +
 > QR, kode pemulihan, setup wajib bila `MFA_SETUP_REQUIRED`) + **halaman Kelola
 > Sekolah** (`ADMIN_SUPER` — daftarkan sekolah baru + admin pertamanya; setiap sekolah
-> terisolasi penuh dari sekolah lain, lihat `backend/MULTI-TENANT.md`). Halaman
+> terisolasi penuh dari sekolah lain, lihat `backend/MULTI-TENANT.md`) + **halaman
+> Tagihan Ekskul** (generate tagihan, validasi pembayaran transfer/cash, report
+> lunas/belum lunas — lihat `backend/README.md` bagian Billing). Halaman
 > dashboard utama masih placeholder.
 
 ## Struktur folder
@@ -39,7 +41,8 @@ web-admin/
 │   │   ├── parent-relations/   # ✅ approval relasi ortu    (Fase 2.4)
 │   │   ├── reports/            # ✅ pratinjau + export PDF/Excel async + riwayat  (Fase 3.1)
 │   │   ├── audit-logs/         # ✅ review audit log (ADMIN_SUPER, read-only)  (Fase 4.1)
-│   │   └── schools/            # ✅ Kelola Sekolah (ADMIN_SUPER) — daftar/suspend/resume/+admin  (beyond-plan)
+│   │   ├── schools/             # ✅ Kelola Sekolah (ADMIN_SUPER) — daftar/suspend/resume/+admin  (beyond-plan)
+│   │   └── billing/            # ✅ Tagihan Ekskul — generate/list/batalkan, validasi bayar, report  (beyond-plan)
 │   │       └── <feature>/api.ts  # hook TanStack Query per entitas
 │   ├── lib/
 │   │   ├── api.ts             # axios + interceptor Bearer + auto-refresh saat 401

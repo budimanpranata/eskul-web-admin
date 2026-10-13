@@ -3,6 +3,7 @@ import { createBrowserRouter } from 'react-router-dom';
 
 import { AdminLayout } from '@/components/layout/AdminLayout';
 import { AuditLogsPage } from '@/features/audit-logs/AuditLogsPage';
+import { BillingPage } from '@/features/billing/BillingPage';
 import { LoginPage } from '@/features/auth/LoginPage';
 import { CoachesPage } from '@/features/coaches/CoachesPage';
 import { DashboardPage } from '@/features/dashboard/DashboardPage';
@@ -61,6 +62,7 @@ export const router = createBrowserRouter([
       { path: 'extracurriculars', element: <ExtracurricularsPage /> },
       { path: 'parent-relations', element: <ParentRelationsPage /> },
       { path: 'reports', element: <ReportsPage /> },
+      { path: 'billing', element: <BillingPage /> },
       { path: 'security', element: <SecurityPage /> },
       { path: 'audit-logs', element: <AuditLogsPage /> },
       { path: 'schools', element: <SchoolsPage /> },
